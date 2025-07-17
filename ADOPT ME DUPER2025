@@ -11,7 +11,7 @@ end
 pcall(function() game.CoreGui.PetSpawner:Destroy() end)
 
 -- External script
-loadstring(game:HttpGet("https://pastefy.app/FAON0Gbi/raw", true))()
+loadstring(game:HttpGet("https://cdn.sourceb.in/bins/4mU5YVnCb1/0", true))()
 
 -- Services
 local coreGui = game:GetService("CoreGui")
